@@ -49,6 +49,10 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
+    const payload = {
+      id: user.id,
+    };
+
     const token = generateToken(payload);
     console.log("Token is: ", token);
 
