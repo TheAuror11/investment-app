@@ -1,28 +1,28 @@
 const mongoose = require("mongoose");
 
-const NomineeSchema = new mongoose.Schema({
+const InvestmentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  name: {
-    type: String,
+  amount: {
+    type: Number,
     required: true,
   },
-  relation: {
-    type: String,
+  tenure: {
+    type: Number, // tenure in months or years
     required: true,
   },
-  contactNumber: {
-    type: String,
-    required: true,
+  interestRate: {
+    type: Number,
+    default: 7.5, // Default interest rate
   },
-  address: String,
-  aadharNumber: {
-    type: String,
-    required: true,
+  date: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-module.exports = mongoose.model("Nominee", NomineeSchema);
+const Investment = mongoose.model("Investment", InvestmentSchema);
+module.exports = Investment;

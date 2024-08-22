@@ -4,10 +4,12 @@ const User = require("../models/User");
 // @desc    Add a nominee
 // @route   POST /api/nominees
 const addNominee = async (req, res) => {
-  const { userId, name, relation, contactNumber, address, aadharNumber } =
-    req.body;
-
+  const { name, relation, contactNumber, address, aadharNumber } = req.body;
+  const userId = req.user.id;
   const user = await User.findById(userId);
+  if (user.isKYCCompleted == false) {
+    return res.status(404).json({ message: "KYC Not Done" });
+  }
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
@@ -33,19 +35,6 @@ const addNominee = async (req, res) => {
   }
 };
 
-// @desc    Get all nominees for a user
-// @route   GET /api/nominees/:userId
-const getNominees = async (req, res) => {
-  const nominees = await Nominee.find({ userId: req.params.userId });
-
-  if (nominees.length > 0) {
-    res.json(nominees);
-  } else {
-    res.status(404).json({ message: "No nominees found" });
-  }
-};
-
 module.exports = {
   addNominee,
-  getNominees,
 };

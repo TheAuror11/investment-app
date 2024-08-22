@@ -1,8 +1,8 @@
 const express = require("express");
-const { addBankAccount } = require("../controllers/bankAccountController");
+const { logoutUser } = require("../controllers/logout");
 const router = express.Router();
 const jwtAuthMiddleware = require("../middlewares/authMiddleware");
 
-router.post("/", jwtAuthMiddleware, addBankAccount);
+router.post("/logout", jwtAuthMiddleware, logoutUser);
 
 module.exports = router;

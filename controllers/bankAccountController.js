@@ -4,9 +4,11 @@ const User = require("../models/User");
 // @desc    Add a bank account for a user
 // @route   POST /api/bankaccounts
 const addBankAccount = async (req, res) => {
-  const { userId, bankName, accountNumber, ifscCode, accountType } = req.body;
+  const userId = req.user.id;
 
-  if (!userId || !bankName || !accountNumber || !ifscCode || !accountType) {
+  const { bankName, accountNumber, ifscCode, accountType } = req.body;
+
+  if (!bankName || !accountNumber || !ifscCode || !accountType) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -14,6 +16,11 @@ const addBankAccount = async (req, res) => {
     // Ensure the user exists
     const user = await User.findById(userId);
 
+    if (user.isKYCCompleted == false) {
+      return res
+        .status(404)
+        .json({ message: "Complete Your KYC Before Adding An Account" });
+    }
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

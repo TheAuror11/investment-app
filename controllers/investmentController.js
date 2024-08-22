@@ -1,36 +1,63 @@
+const User = require("../models/User");
 const Investment = require("../models/Investment");
+const Transaction = require("../models/Transaction");
 
-// @desc    Make an investment
 // @route   POST /api/investments
-const makeInvestment = async (req, res) => {
-  const { userId, investmentType, amount } = req.body;
+// @desc    Create a new investment
+// @access  Private
+const handlePostInvestment = async (req, res) => {
+  const userId = req.user.id;
+  const { amount, tenure, interestRate } = req.body;
 
-  const investment = await Investment.create({
-    userId,
-    investmentType,
-    amount,
-  });
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
 
-  if (investment) {
-    res.status(201).json({ message: "Investment made successfully" });
-  } else {
-    res.status(400).json({ message: "Invalid investment data" });
+    // Check if the user has sufficient balance
+    if (user.balance < amount) {
+      return res.status(400).json({ msg: "Insufficient balance" });
+    }
+
+    // Create a new investment
+    const investment = new Investment({
+      userId,
+      amount,
+      tenure,
+      interestRate: interestRate || 7.5, // Default to 7.5% if not provided
+    });
+
+    // Save the investment
+    const savedInvestment = await investment.save();
+
+    // Deduct the investment amount from the user's balance
+    user.balance -= amount;
+    await user.save();
+
+    // Create a new transaction record
+    const transaction = new Transaction({
+      userId,
+      type: "Debit", // This is a debit transaction
+      amount,
+    });
+
+    // Save the transaction record
+    await transaction.save();
+
+    // Update the user's transactions array
+    user.transactions.push(transaction._id);
+    await user.save();
+
+    res.status(201).json({
+      msg: "Investment created successfully",
+      investment: savedInvestment,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
   }
 };
 
-// @desc    Get all investments for a user
-// @route   GET /api/investments/:userId
-const getInvestments = async (req, res) => {
-  const investments = await Investment.find({ userId: req.params.userId });
-
-  if (investments) {
-    res.json(investments);
-  } else {
-    res.status(404).json({ message: "No investments found" });
-  }
-};
-
-module.exports = {
-  makeInvestment,
-  getInvestments,
-};
+module.exports = handlePostInvestment;

@@ -1,11 +1,8 @@
 const express = require("express");
-const {
-  makeInvestment,
-  getInvestments,
-} = require("../controllers/investmentController");
+const jwtAuthMiddleware = require("../middlewares/authMiddleware");
+const handlePostInvestment = require("../controllers/investmentController");
 const router = express.Router();
 
-router.post("/", makeInvestment);
-router.get("/:userId", getInvestments);
+router.post("/", jwtAuthMiddleware, handlePostInvestment);
 
 module.exports = router;

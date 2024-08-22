@@ -22,7 +22,7 @@ const BankAccountSchema = new mongoose.Schema({
   },
   accountType: {
     type: String,
-    enum: ["savings", "current"],
+    enum: ["savings", "current", "Savings", "Current"],
     required: true,
   },
   createdAt: {

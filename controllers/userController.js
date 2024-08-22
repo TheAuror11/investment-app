@@ -2,10 +2,9 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
+const generateToken = (userData) => {
+  // Generate a new JWT token using user data
+  return jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: 30000 });
 };
 
 // @desc    Register new user
@@ -53,8 +52,8 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
-    const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, "your_jwt_secret", { expiresIn: "1h" });
+    const token = generateToken(payload);
+    console.log("Token is: ", token);
 
     res.status(201).json({ token });
   } catch (err) {
@@ -83,14 +82,9 @@ const authUser = async (req, res) => {
 
     // Generate JWT Token
     const payload = {
-      user: {
-        id: user.id,
-      },
+      id: user.id,
     };
-
-    const token = jwt.sign(payload, "your_jwt_secret", {
-      expiresIn: "1h", // Token expires in 1 hour
-    });
+    const token = generateToken(payload);
 
     res.status(200).json({ token });
   } catch (err) {

@@ -6,13 +6,17 @@ const InvestmentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  investmentType: {
-    type: String,
-    required: true,
-  },
   amount: {
     type: Number,
     required: true,
+  },
+  tenure: {
+    type: Number, // tenure in months or years
+    required: true,
+  },
+  interestRate: {
+    type: Number,
+    default: 7.5, // Default interest rate
   },
   date: {
     type: Date,
@@ -20,4 +24,7 @@ const InvestmentSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Investment", InvestmentSchema);
+mongoose.models = {};
+
+const Investment = mongoose.model("Investment", InvestmentSchema);
+module.exports = Investment;
