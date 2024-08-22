@@ -13,16 +13,17 @@ const addBankAccount = async (req, res) => {
   try {
     const user = await User.findById(userId);
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     if (user.isKYCCompleted == false) {
       return res
         .status(404)
         .json({ message: "Complete Your KYC Before Adding An Account" });
     }
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    const existingAccount = await BankAccount.findOne({ userId });
+    const existingAccount = await BankAccount.findOne({ accountNumber });
 
     if (existingAccount) {
       return res
