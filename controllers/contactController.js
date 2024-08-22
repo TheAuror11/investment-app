@@ -1,7 +1,5 @@
 const Contact = require("../models/Contact");
 
-// @desc    Submit a contact message
-// @route   POST /api/contact
 const submitContactMessage = async (req, res) => {
   const userId = req.user.id;
 

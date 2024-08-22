@@ -1,7 +1,5 @@
 const Transaction = require("../models/Transaction");
 
-// @desc    Handle money transactions (both deposits and withdrawals)
-// @route   POST /api/transactions
 const handleGetAllTransaction = async (req, res) => {
   try {
     const transactions = await Transaction.find();

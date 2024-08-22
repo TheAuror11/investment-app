@@ -3,12 +3,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const generateToken = (userData) => {
-  // Generate a new JWT token using user data
   return jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: 30000 });
 };
 
-// @desc    Register new user
-// @route   POST /api/users/signup
 const registerUser = async (req, res) => {
   try {
     const {
@@ -62,25 +59,20 @@ const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Authenticate user & get token
-// @route   POST /api/users/signin
 const authUser = async (req, res) => {
   const { mobileNumber, password } = req.body;
 
   try {
-    // Check if the user exists by mobile number
     let user = await User.findOne({ mobileNumber });
     if (!user) {
       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
-    // Compare the password with the hashed password
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
-    // Generate JWT Token
     const payload = {
       id: user.id,
     };

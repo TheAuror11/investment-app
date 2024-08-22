@@ -1,8 +1,6 @@
 const BankAccount = require("../models/BankAccount");
 const User = require("../models/User");
 
-// @desc    Add a bank account for a user
-// @route   POST /api/bankaccounts
 const addBankAccount = async (req, res) => {
   const userId = req.user.id;
 
@@ -13,7 +11,6 @@ const addBankAccount = async (req, res) => {
   }
 
   try {
-    // Ensure the user exists
     const user = await User.findById(userId);
 
     if (user.isKYCCompleted == false) {
@@ -25,7 +22,6 @@ const addBankAccount = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the bank account already exists
     const existingAccount = await BankAccount.findOne({ userId });
 
     if (existingAccount) {
@@ -34,7 +30,6 @@ const addBankAccount = async (req, res) => {
         .json({ message: "Bank account already exists for this user" });
     }
 
-    // Create a new bank account
     const bankAccount = new BankAccount({
       userId,
       bankName,

@@ -1,13 +1,11 @@
 const User = require("../models/User");
 
-// @desc    Submit KYC information
-// @route   POST /api/kyc/submit
 const submitKYCInfo = async (req, res) => {
   const { mobileNumber, aadharNumber, panCardNumber, address, gender } =
     req.body;
 
   const userId = req.user.id;
-  // Validate required fields
+
   if (!mobileNumber || !aadharNumber || !panCardNumber || !address || !gender) {
     return res.status(400).json({
       message:
@@ -16,7 +14,6 @@ const submitKYCInfo = async (req, res) => {
   }
 
   try {
-    // Find the user by mobile number
     const user = await User.findById(userId);
 
     if (!user) {
@@ -26,7 +23,6 @@ const submitKYCInfo = async (req, res) => {
     if (user.isKYCCompleted)
       return res.status(404).json({ message: "KYC Already Completed" });
 
-    // Update user with KYC information
     user.aadharNumber = aadharNumber;
     user.panCardNumber = panCardNumber;
     user.address = address;
