@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const generateToken = (id) => {
@@ -10,27 +11,55 @@ const generateToken = (id) => {
 // @desc    Register new user
 // @route   POST /api/users/signup
 const registerUser = async (req, res) => {
-  const { mobileNumber, password } = req.body;
+  try {
+    const {
+      name,
+      email,
+      mobileNumber,
+      password,
+      accountNumber,
+      aadharNumber,
+      panCardNumber,
+      dateOfBirth,
+      gender,
+      address,
+    } = req.body;
 
-  const userExists = await User.findOne({ mobileNumber });
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ msg: "User already exists" });
+    }
 
-  if (userExists) {
-    return res.status(400).json({ message: "User already exists" });
-  }
+    user = await User.findOne({ mobileNumber });
+    if (user) {
+      return res.status(400).json({ msg: "Mobile number already registered" });
+    }
 
-  const user = await User.create({
-    mobileNumber,
-    password,
-  });
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      mobileNumber: user.mobileNumber,
-      token: generateToken(user._id),
+    user = new User({
+      name,
+      email,
+      mobileNumber,
+      passwordHash,
+      accountNumber,
+      aadharNumber,
+      panCardNumber,
+      dateOfBirth,
+      gender,
+      address,
     });
-  } else {
-    res.status(400).json({ message: "Invalid user data" });
+
+    await user.save();
+
+    const payload = { user: { id: user.id } };
+    const token = jwt.sign(payload, "your_jwt_secret", { expiresIn: "1h" });
+
+    res.status(201).json({ token });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
   }
 };
 
@@ -39,16 +68,34 @@ const registerUser = async (req, res) => {
 const authUser = async (req, res) => {
   const { mobileNumber, password } = req.body;
 
-  const user = await User.findOne({ mobileNumber });
+  try {
+    // Check if the user exists by mobile number
+    let user = await User.findOne({ mobileNumber });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid Credentials" });
+    }
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      mobileNumber: user.mobileNumber,
-      token: generateToken(user._id),
+    // Compare the password with the hashed password
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid Credentials" });
+    }
+
+    // Generate JWT Token
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    const token = jwt.sign(payload, "your_jwt_secret", {
+      expiresIn: "1h", // Token expires in 1 hour
     });
-  } else {
-    res.status(401).json({ message: "Invalid credentials" });
+
+    res.status(200).json({ token });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
   }
 };
 
