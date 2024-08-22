@@ -1,0 +1,26 @@
+[
+  {
+    "question": "What is this app?",
+    "answer": "This app is an investment management tool that allows you to manage your investments, track transactions, and more."
+  },
+  {
+    "question": "How do I create an account?",
+    "answer": "To create an account, download the app and follow the registration process, which includes providing your mobile number and completing the KYC process."
+  },
+  {
+    "question": "How can I reset my password?",
+    "answer": "You can reset your password by visiting the login page and clicking on the 'Forgot Password' link."
+  },
+  {
+    "question": "How do I add money to my account?",
+    "answer": "To add money to your account, go to the 'Add Money' section and follow the instructions to deposit funds."
+  },
+  {
+    "question": "How can I contact support?",
+    "answer": "You can contact support by going to the 'Help' section in the app and choosing the 'Contact Support' option."
+  },
+  {
+    "question": "What should I do if I encounter an issue?",
+    "answer": "If you encounter an issue, please reach out to our support team via the 'Help' section, and we will assist you as soon as possible."
+  }
+]
